@@ -2,7 +2,7 @@ import java.util.Scanner
 import kotlin.system.exitProcess
 
 val archivesList = mutableListOf<Archive>()
-var currentMenu = Menu.archive
+var currentMenu = Menu.Archive
 var currentArchive = Archive(null, mutableListOf())
 var currentNote = Note("", "")
 fun main() {
@@ -13,129 +13,128 @@ fun main() {
 fun update() {
     displayCurrentMenu()
     println("\nВведите команду")
-    var input = getUserInput(CommandType.command).toInt()
+    var input = getUserInput(CommandType.Command).toInt()
     when (input) {
         0 -> {
-            if (currentMenu == Menu.archive)
+            if (currentMenu == Menu.Archive)
                 createArchive()
-            else if (currentMenu == Menu.notesList)
+            else if (currentMenu == Menu.NoteList)
                 createNote(currentArchive)
         }
         1 -> {
             exit(currentMenu)
         }
         else -> {
-            input = input - 2
-            if (currentMenu == Menu.archive) {
-                currentMenu = Menu.notesList
+            input -= 2
+            if (currentMenu == Menu.Archive) {
+                currentMenu = Menu.NoteList
                 currentArchive = archivesList[input]
-            } else if (currentMenu == Menu.notesList){
-                currentMenu = Menu.note
+            } else if (currentMenu == Menu.NoteList){
+                currentMenu = Menu.Note
                 currentNote = currentArchive.notes[input]
             }
         }
     }
 }
 fun createNote(archive: Archive) {
-    var note = ""
-    var noteName = ""
     println("Введите название заметки")
-    noteName = getUserInput(CommandType.text)
+    val noteName: String = getUserInput(CommandType.Text)
     println("Введите текст заметки")
-    note = getUserInput(CommandType.text)
+    val note: String = getUserInput(CommandType.Text)
     archive.notes.add(Note(noteName,note))
 }
 fun exit(curMenu: Menu) {
     when (curMenu) {
-        Menu.archive -> exitProcess(-1)
-        Menu.notesList -> {
-            currentMenu = Menu.archive
+        Menu.Archive -> exitProcess(-1)
+        Menu.NoteList -> {
+            currentMenu = Menu.Archive
             currentArchive = Archive(null, mutableListOf())
             currentNote = Note("", "")
             update()
         }
-        Menu.note -> {
-            currentMenu = Menu.notesList
+        Menu.Note -> {
+            currentMenu = Menu.NoteList
             update()
         }
     }
 }
 fun displayCurrentMenu() {
     when (currentMenu) {
-        Menu.archive -> displayArchiveMenu()
-        Menu.notesList -> displayNotesListMenu(currentArchive)
-        Menu.note -> displayNote()
+        Menu.Archive -> displayArchiveMenu()
+        Menu.NoteList -> displayNotesListMenu(currentArchive)
+        Menu.Note -> displayNote()
     }
 }
 fun displayNote(){
-    currentMenu = Menu.note
+    currentMenu = Menu.Note
     println(currentNote.text)
     println("1. Выход")
 }
 fun displayNotesListMenu(archive: Archive) {
-    currentMenu = Menu.notesList
+    currentMenu = Menu.NoteList
     println("Список заметок:")
     println("0. Создать заметку")
     println("1. Выход")
-    archive.notes?.forEachIndexed { ind, i -> println((ind + 2).toString() + ". " + i.name) }
+    archive.notes.forEachIndexed { ind, i -> println((ind + 2).toString() + ". " + i.name) }
 }
 
 fun displayArchiveMenu() {
-    currentMenu = Menu.archive
+    currentMenu = Menu.Archive
     println("Список архивов:")
     println("0. Создать архив")
     println("1. Выход")
-    archivesList?.forEachIndexed { ind, i -> println((ind + 2).toString() + ". " + i.name) }
+    archivesList.forEachIndexed { ind, i -> println((ind + 2).toString() + ". " + i.name) }
 }
 
 fun createArchive(): Archive {
     println("Введите название архива")
-    val res = Archive(getUserInput(CommandType.text), mutableListOf())
+    val res = Archive(getUserInput(CommandType.Text), mutableListOf())
     archivesList.add(res)
     currentArchive = res
     return res
 }
 fun getUserInput(commandType: CommandType): String {
-    var input: String = ""
-    val archiveCommandCheck = input.isNullOrEmpty() || !input.all { it.isDigit() } || input.toInt() > archivesList.size + 1
-    val notesListCommandCheck = input.isNullOrEmpty() || !input.all { it.isDigit() } || input.toInt() > currentArchive.notes.size + 1
-    val notesCommmandCheck = input.isNullOrEmpty() || !input.all { it.isDigit() } || input.toInt() != 1
+    var input = ""
     val wrongInput = "Такого пункта нет. Введите номер пункта: "
-    if (CommandType.text == commandType) {
-        while (input.isNullOrEmpty()) {
+    if (CommandType.Text == commandType) {
+        while (input.isEmpty()) {
             input = Scanner(System.`in`).nextLine()
             if (input.isNullOrEmpty())
                 println("Введите хотя бы один символ:")
         }
-    } else if (CommandType.command == commandType) {
-        if (currentMenu == Menu.archive) {
-            while (archiveCommandCheck) {
-                input = Scanner(System.`in`).nextLine()
-                if (archiveCommandCheck)
-                    println(wrongInput)
+    } else if (CommandType.Command == commandType) {
+        when (currentMenu) {
+            Menu.Archive -> {
+                while (input.isEmpty() || !input.all { it.isDigit() } || input.toInt() > archivesList.size + 1) {
+                    input = Scanner(System.`in`).nextLine()
+                    if (input.isEmpty() || !input.all { it.isDigit() } || input.toInt() > archivesList.size + 1)
+                        println(wrongInput)
+                }
             }
-        } else if (currentMenu == Menu.notesList){
-            while (notesListCommandCheck) {
-                input = Scanner(System.`in`).nextLine()
-                if (notesListCommandCheck)
-                    println(wrongInput)
+            Menu.NoteList -> {
+                while (input.isEmpty() || !input.all { it.isDigit() } || input.toInt() > currentArchive.notes.size + 1) {
+                    input = Scanner(System.`in`).nextLine()
+                    if (input.isEmpty() || !input.all { it.isDigit() } || input.toInt() > currentArchive.notes.size + 1)
+                        println(wrongInput)
+                }
             }
-        } else if (currentMenu == Menu.note){
-            while (notesCommmandCheck){
-                input = Scanner(System.`in`).nextLine()
-                if (notesCommmandCheck)
-                    println(wrongInput)
+            Menu.Note -> {
+                while (input.isEmpty() || !input.all { it.isDigit() } || input.toInt() != 1){
+                    input = Scanner(System.`in`).nextLine()
+                    if (input.isEmpty() || !input.all { it.isDigit() } || input.toInt() != 1)
+                        println(wrongInput)
+                }
             }
         }
     }
     return input
 }
 enum class CommandType {
-    command,
-    text
+    Command,
+    Text
 }
 enum class Menu {
-    archive,
-    notesList,
-    note
+    Archive,
+    NoteList,
+    Note
 }
