@@ -96,13 +96,13 @@ fun createArchive(): Archive {
 fun getUserInput(commandType: CommandType): String {
     var input = ""
     val wrongInput = "Такого пункта нет. Введите номер пункта: "
-    if (CommandType.Text == commandType) {
+    if (commandType == CommandType.Text) {
         while (input.isEmpty()) {
             input = Scanner(System.`in`).nextLine()
             if (input.isNullOrEmpty())
                 println("Введите хотя бы один символ:")
         }
-    } else if (CommandType.Command == commandType) {
+    } else if (commandType == CommandType.Command) {
         when (currentMenu) {
             Menu.Archive -> {
                 while (input.isEmpty() || !input.all { it.isDigit() } || input.toInt() > archivesList.size + 1) {
@@ -128,13 +128,4 @@ fun getUserInput(commandType: CommandType): String {
         }
     }
     return input
-}
-enum class CommandType {
-    Command,
-    Text
-}
-enum class Menu {
-    Archive,
-    NoteList,
-    Note
 }
