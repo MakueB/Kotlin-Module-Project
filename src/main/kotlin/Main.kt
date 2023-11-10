@@ -45,7 +45,10 @@ fun createNote(archive: Archive) {
 }
 fun exit(curMenu: Menu) {
     when (curMenu) {
-        Menu.Archive -> exitProcess(-1)
+        Menu.Archive -> {
+            println("До новых встреч!")
+            exitProcess(-1)
+        }
         Menu.NoteList -> {
             currentMenu = Menu.Archive
             currentArchive = Archive(null, mutableListOf())
